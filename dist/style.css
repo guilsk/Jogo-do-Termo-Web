@@ -67,3 +67,42 @@ body {
 
   font-weight: 800;
 }
+
+.notificacao-acerto {
+  text-align: center;
+
+  color: #4cfd4c;
+
+  border: 1px solid #4cfd4c;
+  border-radius: 15px;
+
+  padding: 10px;
+  max-width: 400px;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.notificacao-erro {
+  text-align: center;
+  color: #ff1c1c;
+
+  border: 1px solid #ff1c1c;
+  border-radius: 15px;
+
+  position: absolute;
+
+  left: 0;
+  right:0;
+
+  padding: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 450px;
+}

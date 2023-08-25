@@ -11,31 +11,31 @@ class TelaTermo {
         this.pnlTermo = document.getElementById('pnlTermo');
         this.pnlTeclado = document.getElementById('pnlTeclado');
         this.btnEnter = document.getElementById('btnEnter');
+        this.btnApagar = document.getElementById('btnApagar');
         this.botoes = [];
         this.linha = 0;
         this.coluna = 0;
     }
     registrarEventos() {
         for (let botao of this.pnlTeclado.children) {
-            botao.addEventListener("click", (sender) => this.escreverLetra(sender));
+            if (botao.textContent != "↤" && botao.textContent != 'Enter')
+                botao.addEventListener("click", (sender) => this.escreverLetra(sender));
         }
         this.btnEnter.addEventListener("click", (sender) => this.darPalpite(sender));
+        this.btnApagar.addEventListener("click", () => this.apagar());
     }
     escreverLetra(sender) {
         const botaoClicado = sender.target;
-        if (botaoClicado.innerText == 'Enter')
+        if (this.jogoDoTermo.palavra.length > 4)
             return;
         this.botoes[this.coluna] = botaoClicado;
-        this.jogoDoTermo.palavra += botaoClicado.innerText;
         const palpite = botaoClicado.textContent[0];
         this.pnlTermo.children.item(this.linha).children.item(this.coluna).textContent = palpite;
+        this.jogoDoTermo.palavra += palpite;
         this.coluna++;
-        if (this.coluna > 4) {
-            this.coluna = 0;
-        }
     }
     darPalpite(sender) {
-        if (this.pnlTermo.children.item(this.linha).children.item(this.coluna).textContent == '')
+        if (this.jogoDoTermo.palavra.length < 5)
             return;
         if (this.jogoDoTermo.palavra == this.jogoDoTermo.palavraSecreta) {
             for (let i = 0; i < 5; i++) {
@@ -50,9 +50,9 @@ class TelaTermo {
         else {
             let i = 0;
             for (let b of this.botoes) {
+                const elemento = this.pnlTermo.children.item(this.linha).children.item(i);
                 if (this.jogoDoTermo.palavraSecreta.includes(b.innerText)) {
                     b.style.backgroundColor = 'yellow';
-                    const elemento = this.pnlTermo.children.item(this.linha).children.item(i);
                     elemento.style.backgroundColor = 'yellow';
                     if (this.jogoDoTermo.palavraSecreta.charAt(i) == this.jogoDoTermo.palavra.charAt(i)) {
                         b.style.backgroundColor = 'green';
@@ -60,7 +60,8 @@ class TelaTermo {
                     }
                 }
                 else {
-                    b.disabled = true;
+                    b.style.backgroundColor = 'gray';
+                    elemento.style.backgroundColor = 'gray';
                 }
                 i++;
             }
@@ -70,6 +71,13 @@ class TelaTermo {
             this.coluna = 0;
         }
     }
+    apagar() {
+        if (this.coluna == 0)
+            return;
+        this.jogoDoTermo.palavra = this.jogoDoTermo.palavra.substring(0, this.jogoDoTermo.palavra.length - 1);
+        this.pnlTermo.children.item(this.linha).children.item(this.coluna - 1).textContent = '';
+        this.coluna--;
+    }
     desabilitarBotoes() {
         for (let botao of this.pnlTeclado.children) {
             const b = botao;
@@ -78,15 +86,35 @@ class TelaTermo {
     }
     finalizarJogo(resultado) {
         if (resultado) {
-            console.log('Ganhou!!!');
+            this.exibirNotificacao("Parabéns, você acertou!", true);
         }
         else {
-            console.log('Perdeu!!!');
+            this.exibirNotificacao("Que pena... você perdeu! A palavra era '" + this.jogoDoTermo.palavraSecreta + "'", false);
         }
         this.desabilitarBotoes();
         setTimeout(function () {
             location.reload();
         }, 5000);
+    }
+    exibirNotificacao(mensagem, jogadorAcertou) {
+        const pnlNotificacao = document.getElementById('pnl-notificacao');
+        const txtNotificacao = document.createElement('p');
+        txtNotificacao.textContent = mensagem;
+        this.classificarNotificacao(jogadorAcertou, txtNotificacao);
+        setTimeout(function () {
+            var _a;
+            (_a = pnlNotificacao.querySelector('p')) === null || _a === void 0 ? void 0 : _a.remove();
+        }, 5000);
+        pnlNotificacao.appendChild(txtNotificacao);
+    }
+    classificarNotificacao(jogadorAcertou, txtNotificacao) {
+        if (jogadorAcertou) {
+            txtNotificacao.classList.remove('notificacao-erro');
+            txtNotificacao.classList.add('notificacao-acerto');
+            return;
+        }
+        txtNotificacao.classList.remove('notificacao-acerto');
+        txtNotificacao.classList.add('notificacao-erro');
     }
 }
 window.addEventListener('load', () => new TelaTermo());
